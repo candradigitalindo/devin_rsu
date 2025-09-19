@@ -15,13 +15,16 @@ Structure
 Local Dev
 - Backend
   - Env: see backend/.env.example
-  - go mod tidy, run cmd/api/main.go
+  - /usr/local/go/bin/go mod tidy
+  - /usr/local/go/bin/go run ./cmd/migrate
+  - /usr/local/go/bin/go run ./cmd/api
 - Frontend
+  - Use Node 20 LTS (nvm use 20). See frontend/README.md
   - Env: see frontend/.env.example
   - pnpm install, pnpm dev
 - Database
-  - Apply docs/saas-rs-db-ddl.sql global section or backend/migrations/global/*.sql
+  - Apply global migration via cmd/migrate or see backend/migrations/global/*.sql
 
 Notes
-- Tenant subdomain parsing in dev can use fixed X-Tenant header
-- Do not commit secrets
+- In dev, set X-Tenant header via frontend plugin or API client
+- Do not commit secrets (.env). .nvmrc pins Node 20 for FE
