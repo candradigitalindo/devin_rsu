@@ -1,14 +1,37 @@
 package server
 
 import (
+	"crypto/rand"
 	"io/ioutil"
+	"os"
 	"strings"
 	"time"
 
 	"github.com/candra/saas-rs-backend/internal/config"
 	"github.com/gofiber/fiber/v2"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/oklog/ulid/v2"
 )
+func newULID() string {
+	id := ulid.MustNew(ulid.Timestamp(time.Now()), rand.Reader)
+	return id.String()
+}
+func readTenantMigration() ([]byte, error) {
+	paths := []string{
+		"migrations/tenant/001_init.sql",
+		"../migrations/tenant/001_init.sql",
+		"../../migrations/tenant/001_init.sql",
+		"backend/migrations/tenant/001_init.sql",
+	}
+	for _, p := range paths {
+		if _, err := os.Stat(p); err == nil {
+			return ioutil.ReadFile(p)
+		}
+	}
+	return nil, os.ErrNotExist
+}
+
+
 
 type createTenantReq struct {
 	Slug string `json:"slug"`
@@ -23,7 +46,8 @@ func createTenant(cfg config.Config, pool *pgxpool.Pool) fiber.Handler {
 			return fiber.NewError(fiber.StatusBadRequest, "invalid")
 		}
 		req.Slug = strings.ToLower(req.Slug)
-		_, err := pool.Exec(c.Context(), `insert into tenants(id,slug,name,plan_id,status) values (left(replace(gen_random_uuid()::text,'-',''),26), $1, $2, $3, 'active') on conflict (slug) do nothing`, req.Slug, req.Name, req.Plan)
+		id := newULID()
+		_, err := pool.Exec(c.Context(), `insert into tenants(id,slug,name,plan_id,status) values ($1, $2, $3, $4, 'active') on conflict (slug) do nothing`, id, req.Slug, req.Name, req.Plan)
 		if err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, "tenant invalid")
 		}
@@ -31,13 +55,30 @@ func createTenant(cfg config.Config, pool *pgxpool.Pool) fiber.Handler {
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, "schema")
 		}
-		sqlBytes, err := ioutil.ReadFile("backend/migrations/tenant/001_init.sql")
+		sqlBytes, err := readTenantMigration()
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, "migration read")
 		}
-		_, err = pool.Exec(c.Context(), `set local search_path = "`+req.Slug+`", public; `+string(sqlBytes))
+		tx, err := pool.Begin(c.Context())
 		if err != nil {
-			return fiber.NewError(fiber.StatusInternalServerError, "migration apply")
+			return fiber.NewError(fiber.StatusInternalServerError, "migration begin")
+		}
+		defer tx.Rollback(c.Context())
+		if _, err = tx.Exec(c.Context(), `set local search_path = "`+req.Slug+`", public`); err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, "migration path")
+		}
+		stmts := strings.Split(string(sqlBytes), ";")
+		for _, s := range stmts {
+			s2 := strings.TrimSpace(s)
+			if s2 == "" {
+				continue
+			}
+			if _, err = tx.Exec(c.Context(), s2); err != nil {
+				return fiber.NewError(fiber.StatusInternalServerError, "migration apply")
+			}
+		}
+		if err = tx.Commit(c.Context()); err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, "migration commit")
 		}
 		return c.Status(201).JSON(fiber.Map{"slug": req.Slug, "status": "provisioned"})
 	}
@@ -78,7 +119,8 @@ func createCategory(pool *pgxpool.Pool) fiber.Handler {
 		if err := c.BodyParser(&req); err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, "invalid")
 		}
-		_, err := pool.Exec(c.Context(), `insert into pharmacy_categories(id,name,code) values (left(replace(gen_random_uuid()::text,'-',''),26), $1, $2)`, req.Name, req.Code)
+		id := newULID()
+		_, err := pool.Exec(c.Context(), `insert into pharmacy_categories(id,name,code) values ($1, $2, $3)`, id, req.Name, req.Code)
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, "db")
 		}
@@ -127,8 +169,9 @@ func createItem(pool *pgxpool.Pool) fiber.Handler {
 		if err := c.BodyParser(&req); err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, "invalid")
 		}
-		_, err := pool.Exec(c.Context(), `insert into pharmacy_items(id,category_id,name,sku,uom,min_stock) values (left(replace(gen_random_uuid()::text,'-',''),26), $1, $2, $3, $4, coalesce($5,0))`,
-			req.CategoryID, req.Name, req.SKU, req.UOM, req.MinStock)
+		id := newULID()
+		_, err := pool.Exec(c.Context(), `insert into pharmacy_items(id,category_id,name,sku,uom,min_stock) values ($1, $2, $3, $4, $5, coalesce($6,0))`,
+			id, req.CategoryID, req.Name, req.SKU, req.UOM, req.MinStock)
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, "db")
 		}
@@ -176,8 +219,9 @@ func createBatch(pool *pgxpool.Pool) fiber.Handler {
 		if err := c.BodyParser(&req); err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, "invalid")
 		}
-		_, err := pool.Exec(c.Context(), `insert into pharmacy_item_batches(id,item_id,batch_no,expiry_date,qty_on_hand) values (left(replace(gen_random_uuid()::text,'-',''),26), $1, $2, $3, $4)`,
-			itemID, req.BatchNo, req.ExpiryDate, req.Qty)
+		id := newULID()
+		_, err := pool.Exec(c.Context(), `insert into pharmacy_item_batches(id,item_id,batch_no,expiry_date,qty_on_hand) values ($1, $2, $3, $4, $5)`,
+			id, itemID, req.BatchNo, req.ExpiryDate, req.Qty)
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, "db")
 		}

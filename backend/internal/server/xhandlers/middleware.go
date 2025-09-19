@@ -56,7 +56,7 @@ func WithTenant(pool *pgxpool.Pool) fiber.Handler {
 		if slug == "" {
 			return fiber.NewError(fiber.StatusBadRequest, "missing tenant")
 		}
-		_, err := pool.Exec(c.Context(), `set local search_path = "`+slug+`", public`)
+		_, err := pool.Exec(c.Context(), `set search_path = "`+slug+`", public`)
 		if err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, "invalid tenant")
 		}
