@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "types": ["nuxt"],
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "baseUrl": "."
+  },
+  "include": [
+    "types/**/*.d.ts",
+    "plugins/**/*.ts",
+    "**/*.vue",
+    "app.vue",
+    "pages/**/*.vue"
+  ]
+}

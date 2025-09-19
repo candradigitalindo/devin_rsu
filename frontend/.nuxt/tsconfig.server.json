@@ -1,0 +1,104 @@
+{
+  "compilerOptions": {
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "jsx": "preserve",
+    "allowSyntheticDefaultImports": true,
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment",
+    "paths": {
+      "#imports": [
+        "./types/nitro-imports"
+      ],
+      "~/*": [
+        "../*"
+      ],
+      "@/*": [
+        "../*"
+      ],
+      "~~/*": [
+        "../*"
+      ],
+      "@@/*": [
+        "../*"
+      ],
+      "nitropack": [
+        "../node_modules/.pnpm/nitropack@2.12.6/node_modules/nitropack"
+      ],
+      "defu": [
+        "../node_modules/.pnpm/defu@6.1.4/node_modules/defu"
+      ],
+      "h3": [
+        "../node_modules/.pnpm/h3@1.15.4/node_modules/h3"
+      ],
+      "consola": [
+        "../node_modules/.pnpm/consola@3.4.2/node_modules/consola"
+      ],
+      "@unhead/vue": [
+        "../node_modules/.pnpm/@unhead+vue@1.11.20_vue@3.5.21_typescript@5.9.2_/node_modules/@unhead/vue"
+      ],
+      "@nuxt/devtools": [
+        "../node_modules/.pnpm/@nuxt+devtools@1.7.0_rollup@4.50.2_vite@5.4.20_terser@5.44.0__vue@3.5.21_typescript@5.9.2_/node_modules/@nuxt/devtools"
+      ],
+      "@vue/runtime-core": [
+        "../node_modules/.pnpm/@vue+runtime-core@3.5.21/node_modules/@vue/runtime-core"
+      ],
+      "@vue/compiler-sfc": [
+        "../node_modules/.pnpm/@vue+compiler-sfc@3.5.21/node_modules/@vue/compiler-sfc"
+      ],
+      "@vue/runtime-dom": [
+        "../node_modules/.pnpm/@vue+runtime-dom@3.5.21/node_modules/@vue/runtime-dom"
+      ],
+      "vue-router": [
+        "../node_modules/.pnpm/vue-router@4.5.1_vue@3.5.21_typescript@5.9.2_/node_modules/vue-router"
+      ],
+      "@nuxt/schema": [
+        "../node_modules/.pnpm/@nuxt+schema@3.12.0_rollup@4.50.2/node_modules/@nuxt/schema"
+      ],
+      "nuxt": [
+        "../node_modules/.pnpm/nuxt@3.12.0_@parcel+watcher@2.5.1_db0@0.3.2_eslint@8.57.1_ioredis@5.7.0_magicast@0.3.5_option_th57qugdqeqofwiitkkkl5lhiu/node_modules/nuxt"
+      ],
+      "#internal/nuxt/paths": [
+        "../node_modules/.pnpm/nuxt@3.12.0_@parcel+watcher@2.5.1_db0@0.3.2_eslint@8.57.1_ioredis@5.7.0_magicast@0.3.5_option_th57qugdqeqofwiitkkkl5lhiu/node_modules/nuxt/dist/core/runtime/nitro/paths"
+      ],
+      "~": [
+        "./.."
+      ],
+      "@": [
+        "./.."
+      ],
+      "~~": [
+        "./.."
+      ],
+      "@@": [
+        "./.."
+      ],
+      "assets": [
+        "../assets"
+      ],
+      "public": [
+        "../public"
+      ]
+    }
+  },
+  "include": [
+    "./types/nitro-nuxt.d.ts",
+    "../node_modules/.pnpm/@nuxt+devtools@1.7.0_rollup@4.50.2_vite@5.4.20_terser@5.44.0__vue@3.5.21_typescript@5.9.2_/node_modules/@nuxt/devtools/runtime/server",
+    "../node_modules/.pnpm/@nuxt+telemetry@2.6.6_magicast@0.3.5/node_modules/@nuxt/telemetry/runtime/server",
+    "./types/nitro.d.ts",
+    "../**/*",
+    "../server/**/*"
+  ],
+  "exclude": [
+    "../node_modules",
+    "../node_modules/.pnpm/nuxt@3.12.0_@parcel+watcher@2.5.1_db0@0.3.2_eslint@8.57.1_ioredis@5.7.0_magicast@0.3.5_option_th57qugdqeqofwiitkkkl5lhiu/node_modules/nuxt/node_modules",
+    "../dist"
+  ]
+}
