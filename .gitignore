@@ -1,0 +1,15 @@
+# Root ignores (common)
+*.log
+.DS_Store
+
+# Env files (safety)
+.env
+.env.*
+
+# Node/Nuxt (if any at root in future)
+node_modules
+.npmrc
+
+# Go build artifacts (if any at root in future)
+bin
+dist
